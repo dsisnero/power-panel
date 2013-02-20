@@ -1,0 +1,9 @@
+.rspec
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+lib/power-panel.rb
+lib/power/panel.rb
+spec/power/panel_spec.rb
+spec/spec_helper.rb
