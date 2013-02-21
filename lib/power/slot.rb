@@ -92,14 +92,31 @@ module Power
 
     end
 
-    def can_connect?(num)
-      !self[num].connected?
+    def connected_slot?(n)
+      self[n].connected?
+    end
+
+
+    def can_connect?(*nums)
+      nums.all?{|n| ! connected_slot?(n)}
+    end
+
+    def size2_array?(numbers)
+      (numbers.kind_of? Array) && numbers.size == 2
     end
 
     def add_double_breaker(numbers,desc,amps)
-      raise AlreadyConnected unless numbers.all?{|n| can_connect?(n)}
+      unless size2_array?(numbers)
+         raise ArgumentError
+      end
+
+      n1, n2 = numbers.sort
+      unless can_connect?(n1,n2)
+        raise AlreadyConnected
+      end
+
       breaker = DoubleBreaker.new(:description => desc, :amps => amps)
-      breaker.connect(*(numbers.map{|n| get_slot(n)}))
+      breaker.connect(get_slot(n1),get_slot(n2))
     end
 
     def add_single_breaker(number,desc,amps)
@@ -133,15 +150,22 @@ module Power
     end
 
     def to_hash
-      services = connected.reduce([]) do |result,slot|
-        result +   [slot.to_array]
-      end
-      {:services => services}
+      {:services => connected_services}
     end
 
     def connected
       slots.select{|b| b.connected?}
     end
+
+    def connected_breakers
+      connected.map{|b| b.breaker}.uniq
+    end
+
+    def connected_services
+      connected_breakers.map{|b| b.to_array}
+    end
+
+
 
   end
 

@@ -7,7 +7,7 @@ require 'json'
 
 module Power
 
-  class AlreadyConnectd < StandardError ;  end
+  class AlreadyConnected < StandardError ;  end
 
 
   module PanelAtts
@@ -61,7 +61,7 @@ module Power
     end
 
     def add(*args)
-      number,desc,amps = ensure_array(args)
+      number,desc,amps = split_args(args)
       add_breaker(number,desc,amps)
     end
 
@@ -95,14 +95,9 @@ module Power
       attributes.merge( slots.to_title_hash).select{|k,v| !v.nil?}.map_kv{|k,v| [k.to_s,v.to_s.upcase] }
     end
 
-    def add_same(*nums,desc)
-      nums.each do |num|
-        add(num,desc)
-      end
-    end
-
     def add_even(*nums,desc)
       nums = ensure_array(nums)
+
       nums.select{|n| n.even?}.each do |num|
         add(num,desc)
       end
@@ -119,6 +114,16 @@ module Power
       slots.each_even(&block)
     end
 
+     def connected_slots
+      slots.connected
+    end
+
+    def each_connected
+      connected_slots.each do |s|
+        yield s
+      end
+    end
+
     def each_odd(&block)
       slots.each_odd(&block)
     end
@@ -133,16 +138,48 @@ module Power
 
     protected
 
-    def ensure_array(nums)
-      case nums.first
-      when Array
-        nums.first
-      when Range
-        nums.first.to_a
-      else
-        nums
-      end
+    def double_array?(args)
+      (args.kind_of? Array) && args.size == 1
     end
+
+
+    def split_args(args)
+      if double_array?(args)
+        split_args(args.first)
+      else
+      num,desc,amps = args
+      unless desc.kind_of? String
+        raise ArgumentError
+      end
+        [num,desc,amps]
+      end
+
+    end
+
+
+
+
+    def ensure_array(num)
+      case num.first
+      when Array
+        if num.first === Array
+          num.first
+        elsif Range
+          num.first.to_a
+        else
+          num
+        end
+
+      when Integer
+        num
+      when Range
+        num.first.to_a
+      else
+        raise ArgumentError
+      end
+
+    end
+
 
 
   end

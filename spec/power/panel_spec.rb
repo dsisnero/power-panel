@@ -15,7 +15,6 @@ module Power
       end
 
       describe 'adding a single circuit' do
-
         it 'should have a slot' do
           subject << [1, 'service', 30]
           slot = subject.get_slot(1)
@@ -32,6 +31,17 @@ module Power
         end
 
       end
+
+      describe 'add even' do
+        context 'with range' do
+
+          it 'should add correctly' do
+            subject.add_even(2..6, 'spare')
+            subject.connected_slots.map{|s| s.number}.should include(2,4,6)
+          end
+        end
+      end
+
 
 
     end
@@ -78,6 +88,9 @@ module Power
                          [30,'Hydrogen Fuel Cell'],
                          [32,'Security Alarm']
                         ])
+
+      File.open('ogd.to_yaml','w'){ |f| f.puts ogd.to_yaml}
+
 
       panel = Panel.load_yaml(ogd.to_yaml)
       sb = panel.get_slot(28)
