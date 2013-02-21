@@ -89,9 +89,6 @@ module Power
                          [32,'Security Alarm']
                         ])
 
-      File.open('ogd.to_yaml','w'){ |f| f.puts ogd.to_yaml}
-
-
       panel = Panel.load_yaml(ogd.to_yaml)
       sb = panel.get_slot(28)
       db = panel.get_slot(24)
