@@ -4,6 +4,9 @@ Manifest.txt
 README.txt
 Rakefile
 lib/power-panel.rb
+lib/power/breaker.rb
 lib/power/panel.rb
+lib/power/slot.rb
+spec/power/breaker_spec.rb
 spec/power/panel_spec.rb
 spec/spec_helper.rb

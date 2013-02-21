@@ -5,6 +5,38 @@ module Power
 
   describe Panel do
 
+
+    context 'a panel initialized with 42 slots' do
+
+      subject{ Panel.new(42)}
+
+      it 'should have correct size' do
+        expect( subject.size).to eq(42)
+      end
+
+      describe 'adding a single circuit' do
+
+        it 'should have a slot' do
+          subject << [1, 'service', 30]
+          slot = subject.get_slot(1)
+          slot.to_array.should == [1,'service',30]
+        end
+
+      end
+
+      describe 'adding a double circuit' do
+        it 'should add correctly' do
+          subject << [[1,3], 'service', 30]
+          slot = subject.get_slot(1)
+          slot.to_array.should == [[1,3],'service', 30]
+        end
+
+      end
+
+
+    end
+
+
     it 'correctly serializes' do
       ogd = Panel.new(42)
       ogd.manufacturer = 'Square D'
@@ -48,7 +80,8 @@ module Power
                         ])
 
       panel = Panel.load_yaml(ogd.to_yaml)
-
+      sb = panel.get_slot(28)
+      db = panel.get_slot(24)
       expect(panel.to_yaml).to eq( ogd.to_yaml)
     end
 
